@@ -27,8 +27,21 @@ func (b Block) ToHash() string {
 	return fmt.Sprintf("%x", sum)
 }
 
+// TODO
 func (b *Block) GetDifficulty() int {
 	return 32
+}
+
+// NewBlock parses the Json data of a new block and creates an instance
+// of a Block struct.
+func NewBlock(data string) *Block {
+	block := new(Block)
+	err := json.Unmarshal([]byte(data), &block)
+	if err != nil {
+		panic(err)
+	}
+	block.Hash = block.ToHash()
+	return block
 }
 
 func main() {
