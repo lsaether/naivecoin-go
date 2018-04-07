@@ -1,9 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"crypto/sha256"
-	"encoding/binary"
+	"encoding/json"
 	"fmt"
 )
 
@@ -11,31 +10,29 @@ type transaction string
 
 // Block contains data of the blockchain.
 type Block struct {
-	index        uint16
-	timestamp    uint16
-	nonce        uint16
-	transactions []transaction
-	previousHash string
-	hash         string
+	Index        uint16
+	Timestamp    uint16
+	Nonce        uint16
+	Transactions []transaction
+	PreviousHash string
+	Hash         string
 }
 
-func (b *Block) ToHash() string {
-	uintBytes := make([]byte, 6)
-	binary.LittleEndian.PutUint16(uintBytes[0:], b.index)
-	binary.LittleEndian.PutUint16(uintBytes[2:], b.timestamp)
-	binary.LittleEndian.PutUint16(uintBytes[4:], b.nonce)
-	// for _, x := range b.transactions {
-
-	// }
-	var buf bytes.Buffer
-	buf.Write(uintBytes)
-	buf.Write([]byte(b.previousHash))
-	sum := sha256.Sum256(buf.Bytes())
+func (b Block) ToHash() string {
+	blockMarshalled, err := json.Marshal(b)
+	if err != nil {
+		panic(err)
+	}
+	sum := sha256.Sum256(blockMarshalled)
 	return fmt.Sprintf("%x", sum)
 }
 
+func (b *Block) GetDifficulty() int {
+	return 32
+}
+
 func main() {
-	b := Block{previousHash: "somedatah3re", index: 3}
+	b := Block{PreviousHash: "somedatah3re", Index: 2}
 	val := b.ToHash()
 	fmt.Println(val)
 }
